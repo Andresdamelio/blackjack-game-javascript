@@ -41,6 +41,12 @@ const takeADeck = () => {
   return deck;
 };
 
-decks = [];
+//takeADeck();
 
-takeADeck();
+const valueDeck = (deck) => {
+  const value = deck.substring(0, deck.length - 1);
+
+  return !isNaN(value) ? parseInt(value) : value === "A" ? 11 : 10;
+};
+
+const value = valueDeck("2D");
