@@ -1,0 +1,28 @@
+html,
+body {
+  margin: 0;
+  background: #fff;
+  color: #000;
+  font-family: Roboto;
+}
+
+.title {
+  text-align: center;
+  background-color: #7952b3;
+  color: #fff;
+  padding: 20px;
+  font-weight: 500;
+  font-size: 25px;
+}
+
+.card-image {
+  position: relative;
+  width: 150px;
+  left: 100px;
+  margin-left: -75px;
+}
+
+#player-cards,
+#computer-cards {
+  height: 240px;
+}
