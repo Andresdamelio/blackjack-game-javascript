@@ -11,6 +11,15 @@
 let decks = [];
 const types = ["C", "D", "H", "S"];
 const specials = ["A", "J", "Q", "K"];
+let playerPoints = 0,
+  computerPoints = 0;
+
+// References
+
+const btnNew = document.querySelector("#btn-new");
+const btnTake = document.querySelector("#btn-take");
+const btnStop = document.querySelector("#btn-stop");
+const smalls = document.querySelectorAll("small");
 
 // Función para crear una nueva baraja
 const createDeck = () => {
@@ -41,12 +50,22 @@ const takeADeck = () => {
   return deck;
 };
 
-//takeADeck();
-
 const valueDeck = (deck) => {
   const value = deck.substring(0, deck.length - 1);
 
   return !isNaN(value) ? parseInt(value) : value === "A" ? 11 : 10;
 };
 
-const value = valueDeck("2D");
+const value = valueDeck(takeADeck());
+
+// Events
+
+btnTake.addEventListener("click", () => {
+  const deck = takeADeck();
+
+  playerPoints = playerPoints + valueDeck(deck);
+
+  smalls[0].innerText = playerPoints;
+
+  console.log(playerPoints);
+});
