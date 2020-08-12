@@ -20,6 +20,8 @@ const btnNew = document.querySelector("#btn-new");
 const btnTake = document.querySelector("#btn-take");
 const btnStop = document.querySelector("#btn-stop");
 const smalls = document.querySelectorAll("small");
+const playerDecks = document.querySelector("#player-decks");
+const computerDecks = document.querySelector("#player-decks");
 
 // Función para crear una nueva baraja
 const createDeck = () => {
@@ -67,5 +69,19 @@ btnTake.addEventListener("click", () => {
 
   smalls[0].innerText = playerPoints;
 
-  console.log(playerPoints);
+  const imgDeck = document.createElement("img");
+  imgDeck.src = `assets/cartas/cartas/${deck}.png`;
+  imgDeck.classList.add("deck-image");
+
+  playerDecks.append(imgDeck);
+
+  if (playerPoints > 21) {
+    console.warn("Lo siento mucho, perdiste");
+    btnTake.disabled = true;
+  } else if(playerPoints === 21){
+    console.log("21, genial");
+    btnTake.disabled = true;
+  }
 });
+
+btnNew.addEventListener("click", () => {});

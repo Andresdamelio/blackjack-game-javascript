@@ -15,14 +15,14 @@ body {
   font-size: 25px;
 }
 
-.card-image {
+.deck-image {
   position: relative;
   width: 150px;
   left: 100px;
   margin-left: -75px;
 }
 
-#player-cards,
-#computer-cards {
+#player-decks,
+#computer-decks {
   height: 240px;
 }
