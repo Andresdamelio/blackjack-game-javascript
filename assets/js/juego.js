@@ -21,7 +21,7 @@ const btnTake = document.querySelector("#btn-take");
 const btnStop = document.querySelector("#btn-stop");
 const smalls = document.querySelectorAll("small");
 const playerDecks = document.querySelector("#player-decks");
-const computerDecks = document.querySelector("#player-decks");
+const computerDecks = document.querySelector("#computer-decks");
 
 // Función para crear una nueva baraja
 const createDeck = () => {
@@ -58,7 +58,25 @@ const valueDeck = (deck) => {
   return !isNaN(value) ? parseInt(value) : value === "A" ? 11 : 10;
 };
 
-const value = valueDeck(takeADeck());
+const computerTurn = (minPoints) => {
+  do {
+    const deck = takeADeck();
+
+    computerPoints = computerPoints + valueDeck(deck);
+
+    smalls[1].innerText = computerPoints;
+
+    const imgDeck = document.createElement("img");
+    imgDeck.src = `assets/cartas/cartas/${deck}.png`;
+    imgDeck.classList.add("deck-image");
+
+    computerDecks.append(imgDeck);
+
+    if (minPoints > 21) {
+      break;
+    }
+  } while (computerPoints < minPoints && minPoints <= 21);
+};
 
 // Events
 
@@ -78,10 +96,19 @@ btnTake.addEventListener("click", () => {
   if (playerPoints > 21) {
     console.warn("Lo siento mucho, perdiste");
     btnTake.disabled = true;
-  } else if(playerPoints === 21){
+    btnStop.disabled = true;
+    computerTurn(playerPoints);
+  } else if (playerPoints === 21) {
     console.log("21, genial");
     btnTake.disabled = true;
+    btnStop.disabled = true;
+    computerTurn(playerPoints);
   }
 });
 
 btnNew.addEventListener("click", () => {});
+btnStop.addEventListener("click", () => {
+  btnTake.disabled = true;
+  btnStop.disabled = true;
+  computerTurn(playerPoints);
+});
