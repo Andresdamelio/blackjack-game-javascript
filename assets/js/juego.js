@@ -75,11 +75,45 @@ const computerTurn = (minPoints) => {
     if (minPoints > 21) {
       break;
     }
-  } while (computerPoints < minPoints && minPoints <= 21);
+  } while (computerPoints <= minPoints && minPoints <= 21);
+
+  setTimeout(() => {
+    if (
+      computerPoints === playerPoints ||
+      (computerPoints > 21 && playerPoints > 21)
+    ) {
+      alert("Nadie gana :(");
+    } else if (
+      computerPoints < playerPoints &&
+      computerPoints <= 21 &&
+      playerPoints !== 21
+    ) {
+      alert("Gana la computadora");
+    } else if (
+      playerPoints < computerPoints &&
+      playerPoints <= 21 &&
+      computerPoints !== 21
+    ) {
+      alert("Ganaste");
+    }
+  }, 50);
 };
 
-// Events
+/*  Events */
 
+// New Game
+btnNew.addEventListener("click", () => {
+  createDeck();
+  playerPoints = 0;
+  computerPoints = 0;
+  smalls.forEach((small) => (small.innerText = 0));
+  playerDecks.innerHTML = "";
+  computerDecks.innerHTML = "";
+  btnTake.disabled = false;
+  btnStop.disabled = false;
+});
+
+// Take a deck
 btnTake.addEventListener("click", () => {
   const deck = takeADeck();
 
@@ -106,7 +140,7 @@ btnTake.addEventListener("click", () => {
   }
 });
 
-btnNew.addEventListener("click", () => {});
+// Stop game for player
 btnStop.addEventListener("click", () => {
   btnTake.disabled = true;
   btnStop.disabled = true;
