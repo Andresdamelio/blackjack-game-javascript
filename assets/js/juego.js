@@ -8,12 +8,12 @@
 
 */
 
-(() => {
+const moduleBlackjack = (() => {
   "use strict";
 
   // definition of variables
   let decks = [],
-    playerPoints = [];
+    playersPoints = [];
 
   const types = ["C", "D", "H", "S"],
     specials = ["A", "J", "Q", "K"];
@@ -26,13 +26,17 @@
   const smalls = document.querySelectorAll("small"),
     decksContainers = document.querySelectorAll(".decks-container");
 
-
   // initialize game
   const initializeGame = (numberPlayers = 2) => {
     decks = createDeck();
-    playerPoints = new Array(numberPlayers).fill(0);
-  };
+    playersPoints = new Array(numberPlayers).fill(0);
 
+    smalls.forEach((small) => (small.innerText = 0));
+    decksContainers.forEach((small) => (small.innerHTML = ""));
+
+    btnTake.disabled = false;
+    btnStop.disabled = false;
+  };
 
   // Create new deck
   const createDeck = () => {
@@ -71,11 +75,11 @@
 
   // player: 0 = first player and computer is last
   const accumulatePoints = (deck, player) => {
-    playerPoints[player] = playerPoints[player] + valueDeck(deck);
+    playersPoints[player] = playersPoints[player] + valueDeck(deck);
 
-    smalls[player].innerText = playerPoints[player];
+    smalls[player].innerText = playersPoints[player];
 
-    return playerPoints[player];
+    return playersPoints[player];
   };
 
   // create HTML for selected deck
@@ -91,6 +95,8 @@
 
   // Determine the winner of the game
   const determineWinner = () => {
+    const [playerPoints, computerPoints] = playersPoints;
+
     setTimeout(() => {
       if (
         computerPoints === playerPoints ||
@@ -110,7 +116,7 @@
       ) {
         alert("Ganaste");
       }
-    }, 50);
+    }, 100);
   };
 
   const computerTurn = (minPoints) => {
@@ -119,27 +125,19 @@
     do {
       const deck = takeADeck();
 
-      computerPoints = accumulatePoints(deck, playerPoints.length - 1);
+      computerPoints = accumulatePoints(deck, playersPoints.length - 1);
 
-      createImageDeck(deck, playerPoints.length - 1);
+      createImageDeck(deck, playersPoints.length - 1);
     } while (computerPoints <= minPoints && minPoints <= 21);
+
+    determineWinner();
   };
 
   /*  Events */
 
   // New Game
   btnNew.addEventListener("click", () => {
-    //createDeck();
-
     initializeGame();
-
-    /*  playerPoints = 0;
-    computerPoints = 0; */
-    /* smalls.forEach((small) => (small.innerText = 0));
-    playerDecks.innerHTML = "";
-    computerDecks.innerHTML = "";
-    btnTake.disabled = false;
-    btnStop.disabled = false; */
   });
 
   // Take a deck
@@ -167,6 +165,10 @@
   btnStop.addEventListener("click", () => {
     btnTake.disabled = true;
     btnStop.disabled = true;
-    computerTurn(playerPoints);
+    computerTurn(playersPoints[0]);
   });
+
+  return {
+    newGame: initializeGame
+  }
 })();
