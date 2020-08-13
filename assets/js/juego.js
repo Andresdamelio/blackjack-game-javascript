@@ -8,141 +8,165 @@
 
 */
 
-let decks = [];
-const types = ["C", "D", "H", "S"];
-const specials = ["A", "J", "Q", "K"];
-let playerPoints = 0,
-  computerPoints = 0;
+(() => {
+  "use strict";
 
-// References
+  // definition of variables
+  let decks = [],
+    playerPoints = [];
 
-const btnNew = document.querySelector("#btn-new");
-const btnTake = document.querySelector("#btn-take");
-const btnStop = document.querySelector("#btn-stop");
-const smalls = document.querySelectorAll("small");
-const playerDecks = document.querySelector("#player-decks");
-const computerDecks = document.querySelector("#computer-decks");
+  const types = ["C", "D", "H", "S"],
+    specials = ["A", "J", "Q", "K"];
 
-// Función para crear una nueva baraja
-const createDeck = () => {
-  for (let i = 2; i <= 10; i++) {
+  // definition of variables for HTML
+  const btnNew = document.querySelector("#btn-new"),
+    btnTake = document.querySelector("#btn-take"),
+    btnStop = document.querySelector("#btn-stop");
+
+  const smalls = document.querySelectorAll("small"),
+    decksContainers = document.querySelectorAll(".decks-container");
+
+
+  // initialize game
+  const initializeGame = (numberPlayers = 2) => {
+    decks = createDeck();
+    playerPoints = new Array(numberPlayers).fill(0);
+  };
+
+
+  // Create new deck
+  const createDeck = () => {
+    decks = [];
+
+    for (let i = 2; i <= 10; i++) {
+      for (const type of types) {
+        decks.push(i + type);
+      }
+    }
+
     for (const type of types) {
-      decks.push(i + type);
+      for (const special of specials) {
+        decks.push(special + type);
+      }
     }
-  }
 
-  for (const type of types) {
-    for (const special of specials) {
-      decks.push(special + type);
+    return _.shuffle(decks);
+  };
+
+  // Take a deck
+  const takeADeck = () => {
+    if (!decks.length) {
+      throw new Error("No hay más cartas");
     }
-  }
 
-  decks = _.shuffle(decks);
-};
+    return decks.pop();
+  };
 
-createDeck();
+  // value of the selected deck
+  const valueDeck = (deck) => {
+    const value = deck.substring(0, deck.length - 1);
 
-const takeADeck = () => {
-  if (!decks.length) {
-    throw new Error("No hay más cartas");
-  }
+    return !isNaN(value) ? parseInt(value) : value === "A" ? 11 : 10;
+  };
 
-  const deck = decks.pop();
+  // player: 0 = first player and computer is last
+  const accumulatePoints = (deck, player) => {
+    playerPoints[player] = playerPoints[player] + valueDeck(deck);
 
-  return deck;
-};
+    smalls[player].innerText = playerPoints[player];
 
-const valueDeck = (deck) => {
-  const value = deck.substring(0, deck.length - 1);
+    return playerPoints[player];
+  };
 
-  return !isNaN(value) ? parseInt(value) : value === "A" ? 11 : 10;
-};
-
-const computerTurn = (minPoints) => {
-  do {
-    const deck = takeADeck();
-
-    computerPoints = computerPoints + valueDeck(deck);
-
-    smalls[1].innerText = computerPoints;
-
+  // create HTML for selected deck
+  const createImageDeck = (deck, player) => {
     const imgDeck = document.createElement("img");
+
     imgDeck.src = `assets/cartas/cartas/${deck}.png`;
+
     imgDeck.classList.add("deck-image");
 
-    computerDecks.append(imgDeck);
+    decksContainers[player].append(imgDeck);
+  };
 
-    if (minPoints > 21) {
-      break;
+  // Determine the winner of the game
+  const determineWinner = () => {
+    setTimeout(() => {
+      if (
+        computerPoints === playerPoints ||
+        (computerPoints > 21 && playerPoints > 21)
+      ) {
+        alert("Nadie gana :(");
+      } else if (
+        computerPoints < playerPoints &&
+        computerPoints <= 21 &&
+        playerPoints !== 21
+      ) {
+        alert("Gana la computadora");
+      } else if (
+        playerPoints < computerPoints &&
+        playerPoints <= 21 &&
+        computerPoints !== 21
+      ) {
+        alert("Ganaste");
+      }
+    }, 50);
+  };
+
+  const computerTurn = (minPoints) => {
+    let computerPoints = 0;
+
+    do {
+      const deck = takeADeck();
+
+      computerPoints = accumulatePoints(deck, playerPoints.length - 1);
+
+      createImageDeck(deck, playerPoints.length - 1);
+    } while (computerPoints <= minPoints && minPoints <= 21);
+  };
+
+  /*  Events */
+
+  // New Game
+  btnNew.addEventListener("click", () => {
+    //createDeck();
+
+    initializeGame();
+
+    /*  playerPoints = 0;
+    computerPoints = 0; */
+    /* smalls.forEach((small) => (small.innerText = 0));
+    playerDecks.innerHTML = "";
+    computerDecks.innerHTML = "";
+    btnTake.disabled = false;
+    btnStop.disabled = false; */
+  });
+
+  // Take a deck
+  btnTake.addEventListener("click", () => {
+    const deck = takeADeck();
+
+    const playerPoints = accumulatePoints(deck, 0);
+
+    createImageDeck(deck, 0);
+
+    if (playerPoints > 21) {
+      console.warn("Lo siento mucho, perdiste");
+      btnTake.disabled = true;
+      btnStop.disabled = true;
+      computerTurn(playerPoints);
+    } else if (playerPoints === 21) {
+      console.log("21, genial");
+      btnTake.disabled = true;
+      btnStop.disabled = true;
+      computerTurn(playerPoints);
     }
-  } while (computerPoints <= minPoints && minPoints <= 21);
+  });
 
-  setTimeout(() => {
-    if (
-      computerPoints === playerPoints ||
-      (computerPoints > 21 && playerPoints > 21)
-    ) {
-      alert("Nadie gana :(");
-    } else if (
-      computerPoints < playerPoints &&
-      computerPoints <= 21 &&
-      playerPoints !== 21
-    ) {
-      alert("Gana la computadora");
-    } else if (
-      playerPoints < computerPoints &&
-      playerPoints <= 21 &&
-      computerPoints !== 21
-    ) {
-      alert("Ganaste");
-    }
-  }, 50);
-};
-
-/*  Events */
-
-// New Game
-btnNew.addEventListener("click", () => {
-  createDeck();
-  playerPoints = 0;
-  computerPoints = 0;
-  smalls.forEach((small) => (small.innerText = 0));
-  playerDecks.innerHTML = "";
-  computerDecks.innerHTML = "";
-  btnTake.disabled = false;
-  btnStop.disabled = false;
-});
-
-// Take a deck
-btnTake.addEventListener("click", () => {
-  const deck = takeADeck();
-
-  playerPoints = playerPoints + valueDeck(deck);
-
-  smalls[0].innerText = playerPoints;
-
-  const imgDeck = document.createElement("img");
-  imgDeck.src = `assets/cartas/cartas/${deck}.png`;
-  imgDeck.classList.add("deck-image");
-
-  playerDecks.append(imgDeck);
-
-  if (playerPoints > 21) {
-    console.warn("Lo siento mucho, perdiste");
+  // Stop game for player
+  btnStop.addEventListener("click", () => {
     btnTake.disabled = true;
     btnStop.disabled = true;
     computerTurn(playerPoints);
-  } else if (playerPoints === 21) {
-    console.log("21, genial");
-    btnTake.disabled = true;
-    btnStop.disabled = true;
-    computerTurn(playerPoints);
-  }
-});
-
-// Stop game for player
-btnStop.addEventListener("click", () => {
-  btnTake.disabled = true;
-  btnStop.disabled = true;
-  computerTurn(playerPoints);
-});
+  });
+})();
